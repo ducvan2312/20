@@ -1,0 +1,187 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+
+  <meta name="theme-color" content="#0d0410">
+  <title>Quà 20/10 cho Huyền</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Dancing+Script:wght@500;700&family=Playfair+Display:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+<!-- Tim rơi như tuyết + pháo hoa (canvas) -->
+  <canvas id="fx" aria-hidden="true"></canvas>
+
+  <!-- Chữ nền chạy chậm -->
+  <div class="mq-layer" aria-hidden="true">
+    <div class="mq" style="--top:2%;  --dur:90s;  --r:-2deg; --dir:normal"><div class="mq-track" data-text="Chồng yêu ♥ Đức Văn ♥"></div></div>
+    <div class="mq" style="--top:22%; --dur:70s;  --r:2deg;  --dir:reverse"><div class="mq-track" data-text="♥ Huyền xinh gái ♥"></div></div>
+    <div class="mq" style="--top:44%; --dur:100s; --r:-1deg; --dir:normal"><div class="mq-track" data-text="Đức Văn ♥ Chồng yêu ♥"></div></div>
+    <div class="mq" style="--top:66%; --dur:75s;  --r:2deg;  --dir:reverse"><div class="mq-track" data-text="♥ Huyền xinh gái ♥ Chồng yêu"></div></div>
+    <div class="mq" style="--top:86%; --dur:95s;  --r:-2deg; --dir:normal"><div class="mq-track" data-text="Đức Văn ♥ Huyền xinh gái ♥"></div></div>
+  </div>
+
+  <!-- Nút nhạc -->
+  <button id="musicBtn" class="music-btn" type="button" aria-pressed="false" aria-label="Bật hoặc tắt giai điệu">
+    <span class="music-icon">♪</span><span id="musicLabel">Bật nhạc</span>
+  </button>
+
+  <main class="page">
+    <p class="eyebrow">✦ MỘT NGÀY DÀNH RIÊNG CHO EM ✦</p>
+
+    <!-- Vòng tròn: ảnh quay quanh lời chúc -->
+    <section class="stage" aria-label="Chúc mừng 20/10 Huyền xinh gái">
+      <div class="track"></div>
+      <div class="orbit">
+        <div class="slot" style="--a:0deg"><div class="ph" data-emoji="🌹"><img src="./images/p1.jpg" alt="" width="360" height="360"></div></div>
+        <div class="slot" style="--a:60deg"><div class="ph" data-emoji="🌸"><img src="./images/p2.jpg" alt="" width="360" height="360"></div></div>
+        <div class="slot" style="--a:120deg"><div class="ph" data-emoji="💐"><img src="./images/p3.jpg" alt="" width="360" height="360"></div></div>
+        <div class="slot" style="--a:180deg"><div class="ph" data-emoji="🌷"><img src="./images/p4.jpg" alt="" width="360" height="360"></div></div>
+        <div class="slot" style="--a:240deg"><div class="ph" data-emoji="✨"><img src="./images/p5.jpg" alt="" width="360" height="360"></div></div>
+        <div class="slot" style="--a:300deg"><div class="ph" data-emoji="💖"><img src="./images/p6.jpg" alt="" width="360" height="360"></div></div>
+        <i class="dot" style="--a:30deg"><b>♥</b></i>
+        <i class="dot" style="--a:90deg"><b>♥</b></i>
+        <i class="dot" style="--a:150deg"><b>♥</b></i>
+        <i class="dot" style="--a:210deg"><b>♥</b></i>
+        <i class="dot" style="--a:270deg"><b>♥</b></i>
+        <i class="dot" style="--a:330deg"><b>♥</b></i>
+      </div>
+      <div class="core">
+        <p class="c-script">Chúc mừng ngày</p>
+        <h1 class="c-date">20/10</h1>
+        <h2 class="c-name">HUYỀN XINH GÁI <span class="heart">♥</span></h2>
+      </div>
+    </section>
+
+    <p class="sub">Gửi đến người con gái tuyệt vời nhất của anh</p>
+
+    <!-- Lời chúc: bấm lần 1 xem lời chúc, bấm lần 2 nhận bó hoa -->
+    <div class="wish" id="wish">
+      <button id="wishBtn" class="wish-btn pulse" type="button" aria-expanded="false" aria-controls="wishBody">
+        <span id="wishIcon" class="hand" aria-hidden="true">👆</span>
+        <span id="wishLabel">Ấn vào đây để xem lời chúc</span>
+      </button>
+      <div id="wishBody" class="wish-body">
+        <div class="wish-clip">
+          <div class="wish-card">
+            <p>Cảm ơn em vì luôn là ánh sáng, là niềm vui và là điều đặc biệt trong cuộc sống của anh. Chúc em luôn xinh đẹp, hạnh phúc và thành công trong mọi hành trình phía trước!</p>
+            <p class="sig">— Đức Văn ♥</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bó hoa hồng 20/10 -->
+  <div id="bouquet" class="bq" role="dialog" aria-modal="true" aria-labelledby="bqTitle" hidden>
+    <div class="bq-back" data-close></div>
+    <div class="bq-box">
+      <h3 id="bqTitle" class="bq-title">Tặng em bó hoa 20/10</h3>
+
+      <svg class="bq-svg" viewBox="0 0 400 480" role="img" aria-label="Bó hoa hồng lớn có tấm thiệp ghi 20/10">
+        <defs>
+          <linearGradient id="gLeaf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46b873"/><stop offset="1" stop-color="#14603a"/></linearGradient>
+          <linearGradient id="gPaperA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb3cf"/><stop offset="1" stop-color="#e0457f"/></linearGradient>
+          <linearGradient id="gPaperB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2f8"/><stop offset="1" stop-color="#ffc2da"/></linearGradient>
+          <linearGradient id="gPaperC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#d63a7a"/><stop offset="1" stop-color="#8f1646"/></linearGradient>
+          <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c99a3a"/><stop offset=".5" stop-color="#ffe9a8"/><stop offset="1" stop-color="#c99a3a"/></linearGradient>
+          <radialGradient id="gShade"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".42"/></radialGradient>
+
+          <!-- Lá -->
+          <g id="leaf">
+            <path d="M0,0 C-20,-28 -22,-72 0,-110 C22,-72 20,-28 0,0Z" fill="url(#gLeaf)"/>
+            <path d="M0,-6 L0,-96" stroke="#9be8b4" stroke-opacity=".55" stroke-width="2" fill="none"/>
+          </g>
+
+          <!-- Hoa hồng (màu lấy từ thuộc tính color của thẻ use) -->
+          <symbol id="rose" viewBox="-50 -50 100 100" overflow="visible">
+            <circle r="46" fill="currentColor"/>
+            <circle r="46" fill="url(#gShade)"/>
+            <path d="M-31,-8 C-27,-35 7,-41 27,-23 C41,-8 35,21 14,31 C-9,41 -35,27 -31,-8Z" fill="currentColor" stroke="#000" stroke-opacity=".28" stroke-width="1.6"/>
+            <path d="M-21,-4 C-19,-25 7,-29 19,-14 C29,-2 23,17 6,21 C-11,25 -25,12 -21,-4Z" fill="currentColor" stroke="#000" stroke-opacity=".3" stroke-width="1.6"/>
+            <path d="M-11,0 C-11,-15 7,-17 13,-6 C17,2 11,13 0,13 C-9,13 -13,6 -11,0Z" fill="currentColor" stroke="#000" stroke-opacity=".32" stroke-width="1.6"/>
+            <path d="M-4,-2 C-3,-9 7,-8 7,-1 C7,5 -2,6 -4,-2Z" fill="#000" fill-opacity=".34"/>
+            <path d="M-24,-22 C-10,-37 14,-37 25,-24" stroke="#fff" stroke-opacity=".38" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </symbol>
+
+          <!-- Ngôi sao lấp lánh -->
+          <path id="star" d="M0,-11 L2.6,-2.6 L11,0 L2.6,2.6 L0,11 L-2.6,2.6 L-11,0 L-2.6,-2.6Z" fill="#ffe9a8"/>
+        </defs>
+
+        <g class="sway">
+          <!-- Lá -->
+          <use href="#leaf" transform="translate(200 300) rotate(-82) scale(1.1)"/>
+          <use href="#leaf" transform="translate(200 300) rotate(-56) scale(1.12)"/>
+          <use href="#leaf" transform="translate(200 300) rotate(-30) scale(1.05)"/>
+          <use href="#leaf" transform="translate(200 300) rotate(30) scale(1.05)"/>
+          <use href="#leaf" transform="translate(200 300) rotate(56) scale(1.12)"/>
+          <use href="#leaf" transform="translate(200 300) rotate(82) scale(1.1)"/>
+
+          <!-- Hoa lớp sau -->
+          <g transform="translate(200 90)"><g class="pop" style="--d:.30s"><use href="#rose" x="-42" y="-42" width="84" height="84" style="color:#ff4d7d"/></g></g>
+          <g transform="translate(116 136)"><g class="pop" style="--d:.22s"><use href="#rose" x="-39" y="-39" width="78" height="78" style="color:#f06fa3"/></g></g>
+          <g transform="translate(284 136)"><g class="pop" style="--d:.26s"><use href="#rose" x="-39" y="-39" width="78" height="78" style="color:#f06fa3"/></g></g>
+          <g transform="translate(64 206)"><g class="pop" style="--d:.14s"><use href="#rose" x="-34" y="-34" width="68" height="68" style="color:#a8174a"/></g></g>
+          <g transform="translate(336 206)"><g class="pop" style="--d:.18s"><use href="#rose" x="-34" y="-34" width="68" height="68" style="color:#a8174a"/></g></g>
+          <!-- Hoa lớp giữa -->
+          <g transform="translate(150 176)"><g class="pop" style="--d:.34s"><use href="#rose" x="-46" y="-46" width="92" height="92" style="color:#e0245e"/></g></g>
+          <g transform="translate(250 176)"><g class="pop" style="--d:.38s"><use href="#rose" x="-46" y="-46" width="92" height="92" style="color:#ff8db8"/></g></g>
+          <g transform="translate(200 140)"><g class="pop" style="--d:.42s"><use href="#rose" x="-43" y="-43" width="86" height="86" style="color:#d81b55"/></g></g>
+          <!-- Hoa lớp trước -->
+          <g transform="translate(108 254)"><g class="pop" style="--d:.46s"><use href="#rose" x="-38" y="-38" width="76" height="76" style="color:#ff9cc2"/></g></g>
+          <g transform="translate(292 254)"><g class="pop" style="--d:.50s"><use href="#rose" x="-38" y="-38" width="76" height="76" style="color:#e0245e"/></g></g>
+          <g transform="translate(200 224)"><g class="pop" style="--d:.56s"><use href="#rose" x="-50" y="-50" width="100" height="100" style="color:#ff3b6b"/></g></g>
+          <g transform="translate(146 276)"><g class="pop" style="--d:.60s"><use href="#rose" x="-31" y="-31" width="62" height="62" style="color:#ff7aa6"/></g></g>
+          <g transform="translate(254 276)"><g class="pop" style="--d:.64s"><use href="#rose" x="-31" y="-31" width="62" height="62" style="color:#c61a50"/></g></g>
+
+          <!-- Giấy gói -->
+          <path d="M58,258 Q200,306 342,258 L252,470 Q200,482 148,470 Z" fill="url(#gPaperA)"/>
+          <path d="M58,258 Q140,300 204,306 L200,474 L148,470 Z" fill="url(#gPaperC)"/>
+          <path d="M342,258 Q260,300 196,306 L200,474 L252,470 Z" fill="url(#gPaperB)"/>
+          <path d="M204,306 L200,474" stroke="#fff" stroke-opacity=".35" stroke-width="1.5" fill="none"/>
+          <path d="M58,258 Q200,306 342,258" stroke="#fff" stroke-opacity=".4" stroke-width="2" fill="none"/>
+
+          <!-- Dây ruy băng + nơ -->
+          <path d="M96,392 Q200,414 304,392 L300,410 Q200,432 100,410 Z" fill="url(#gGold)"/>
+          <g transform="translate(200 414)">
+            <path d="M0,0 C-30,-26 -54,-8 -47,12 C-41,28 -14,14 0,0Z" fill="url(#gGold)" stroke="#a97b22" stroke-opacity=".5"/>
+            <path d="M0,0 C30,-26 54,-8 47,12 C41,28 14,14 0,0Z" fill="url(#gGold)" stroke="#a97b22" stroke-opacity=".5"/>
+            <path d="M-3,4 L-24,44 L-9,37 L-3,50Z" fill="url(#gGold)"/>
+            <path d="M3,4 L24,44 L9,37 L3,50Z" fill="url(#gGold)"/>
+            <circle r="8" fill="#ffe9a8" stroke="#a97b22" stroke-opacity=".5"/>
+          </g>
+
+          <!-- Tấm thiệp 20/10 -->
+          <g transform="translate(200 342) rotate(-3)">
+            <g class="pop" style="--d:.75s">
+              <rect x="-88" y="-42" width="176" height="84" rx="14" fill="#fff5f9" stroke="#ffc2da" stroke-width="3"/>
+              <text x="0" y="12" text-anchor="middle" class="bq-20">20/10</text>
+              <text x="0" y="34" text-anchor="middle" class="bq-name">Huyền xinh gái ♥</text>
+            </g>
+          </g>
+        </g>
+
+        <!-- Lấp lánh -->
+        <g transform="translate(42 70)"><use href="#star" class="tw" style="--d:0s"/></g>
+        <g transform="translate(360 56)"><use href="#star" class="tw" style="--d:.7s"/></g>
+        <g transform="translate(24 170)"><use href="#star" class="tw" style="--d:1.3s"/></g>
+        <g transform="translate(376 160)"><use href="#star" class="tw" style="--d:.4s"/></g>
+        <g transform="translate(110 28)"><use href="#star" class="tw" style="--d:1.8s"/></g>
+        <g transform="translate(300 24)"><use href="#star" class="tw" style="--d:1.1s"/></g>
+      </svg>
+
+      <p class="bq-sign">Chúc mừng ngày Phụ nữ Việt Nam · Đức Văn ♥ Huyền</p>
+      <div class="bq-actions">
+        <button id="bqNext" class="bq-next" type="button">Tiếp theo: trái tim cho em ♥</button>
+        <button id="bqClose" class="bq-close" type="button" data-close>Đóng ×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trái tim chữ "yêu em" -->
+  <div id="heartScene" class="hs" role="dialog" aria-modal="true" aria-label="Trái tim ghép từ chữ yêu em" hidden>
+    <canvas id="heartCanvas"></canvas>
+    <p class="hs-cap">Huyền xinh gái · 20/10 · Đức Văn ♥</p>
+    <button id="hsClose" class="bq-close hs-close" type="button">Đóng ×</button>
+  </div>
+
+  <script src="./script.js"></script>
+
+</body></html>
