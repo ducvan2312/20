@@ -1,5 +1,5 @@
 /* ==========================================================
-   Quà 20/10 cho Huyền — JavaScript thuần
+   Quà 20/10 cho Huyền Xinh gái — JavaScript thuần
    Tim rơi như tuyết, pháo hoa, bấm 2 lần ra bó hoa, nhạc
    ========================================================== */
 (function () {
@@ -118,6 +118,104 @@
     }
   }
 
+  /* --- Hoa nở bung và mưa cánh hoa (vẽ trên canvas) --- */
+  var blooms = [], petals = [];
+  var BLOOM_COLORS = [['#ffd0e3', '#ff5c9d'], ['#ffb3d1', '#e0245e'], ['#fff0f6', '#ff8db8'], ['#ffe3a8', '#ff6fa5']];
+  var PETAL_COLORS = ['#ff9ec7', '#ff6fa5', '#ffc4dc', '#ff3d85', '#ffd9e8'];
+
+  function easeOutBack(x) {
+    var c1 = 1.70158, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+  }
+
+  function bloom(x, y, size, delayMs) {
+    if (!ctx) return;
+    blooms.push({ x: x, y: y, size: size, t0: performance.now() + (delayMs || 0), c: pick(BLOOM_COLORS), rot: rand(0, 6.28) });
+    if (blooms.length > 12) blooms.shift();
+  }
+
+  function petalRain(n) {
+    if (!ctx) return;
+    for (var i = 0; i < n && petals.length < 120; i++) {
+      petals.push({
+        x: rand(0, W), y: rand(-H * 0.5, -10),
+        vy: rand(1.1, 2.4), vx: rand(-0.3, 0.3),
+        rot: rand(0, 6.28), vr: rand(-0.05, 0.05),
+        s: rand(7, 15), ph: rand(0, 6.28), c: pick(PETAL_COLORS)
+      });
+    }
+  }
+
+  function drawBlooms(now) {
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = blooms.length - 1; i >= 0; i--) {
+      var b = blooms[i];
+      var p = (now - b.t0) / 2400;
+      if (p < 0) continue;
+      if (p >= 1) { blooms.splice(i, 1); continue; }
+      var open = easeOutBack(Math.min(1, p / 0.55));
+      var fade = p < 0.6 ? 1 : 1 - (p - 0.6) / 0.4;
+      var R = b.size * open;
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      for (var ring = 0; ring < 3; ring++) {
+        var n = ring === 1 ? 10 : 8;
+        var rr = R * (1 - ring * 0.26);
+        var rot = b.rot + p * (ring % 2 ? -1 : 1) * 0.9 + ring * 0.3;
+        for (var k = 0; k < n; k++) {
+          ctx.save();
+          ctx.rotate(rot + (k * 6.2832) / n);
+          ctx.translate(0, -rr * 0.55);
+          var g = ctx.createLinearGradient(0, rr * 0.5, 0, -rr * 0.5);
+          g.addColorStop(0, b.c[1]);
+          g.addColorStop(1, b.c[0]);
+          ctx.globalAlpha = 0.5 * fade * (1 - ring * 0.18);
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, rr * 0.2, rr * 0.5, 0, 0, 6.2832);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+      var cg = ctx.createRadialGradient(0, 0, 0, 0, 0, R * 0.28);
+      cg.addColorStop(0, 'rgba(255,236,170,0.95)');
+      cg.addColorStop(1, 'rgba(255,200,120,0)');
+      ctx.globalAlpha = fade;
+      ctx.fillStyle = cg;
+      ctx.beginPath();
+      ctx.arc(0, 0, R * 0.28, 0, 6.2832);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+  }
+
+  function drawPetals(dt) {
+    for (var i = petals.length - 1; i >= 0; i--) {
+      var q = petals[i];
+      q.y += q.vy * dt;
+      q.ph += 0.03 * dt;
+      q.x += (q.vx + Math.sin(q.ph) * 0.9) * dt;
+      q.rot += q.vr * dt;
+      if (q.y > H + 20) { petals.splice(i, 1); continue; }
+      var s = q.s;
+      ctx.save();
+      ctx.translate(q.x, q.y);
+      ctx.rotate(q.rot);
+      ctx.scale(1, 0.55 + 0.45 * Math.abs(Math.sin(q.ph * 1.3)));
+      ctx.globalAlpha = 0.85;
+      ctx.fillStyle = q.c;
+      ctx.beginPath();
+      ctx.moveTo(0, -s);
+      ctx.bezierCurveTo(s * 0.9, -s * 0.5, s * 0.7, s * 0.6, 0, s);
+      ctx.bezierCurveTo(-s * 0.7, s * 0.6, -s * 0.9, -s * 0.5, 0, -s);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+  }
+
   function frame(now) {
     raf = requestAnimationFrame(frame);
     var dt = Math.min((now - last) / 16.667, 3);
@@ -171,6 +269,9 @@
     }
     ctx.globalAlpha = 1;
     ctx.globalCompositeOperation = 'source-over';
+
+    drawBlooms(now);
+    drawPetals(dt);
   }
 
   function startLoop() {
@@ -200,6 +301,157 @@
     if (!reduce) setTimeout(autoFireworks, 1200);
   }
 
+  /* ---------------- Hình cầu ảnh 3D ----------------
+     24 ảnh và 34 trái tim nằm trên mặt cầu (điểm Fibonacci), quay quanh trục
+     nghiêng, chiếu phối cảnh: phía trước lớn và rõ, phía sau nhỏ và mờ.
+     Kéo chuột / vuốt ngang để xoay. Lúc vào trang quả cầu "nở" bung ra. */
+  var gGlobe = $('#globe');
+  var G_EMOJI = ['🌹', '🌸', '💐', '🌷', '✨', '💖'];
+  var gNodes = [], gRot = 0, gTilt = 0.38, gVel = 0, gT0 = 0, gLast = 0, gDrag = null;
+
+  function fib(n, i) {
+    var y = 1 - ((i + 0.5) * 2) / n;
+    var r = Math.sqrt(Math.max(0, 1 - y * y));
+    var a = i * 2.399963;
+    return [Math.cos(a) * r, y, Math.sin(a) * r];
+  }
+
+  function smooth(a, b, x) {
+    var t = Math.max(0, Math.min(1, (x - a) / (b - a)));
+    return t * t * (3 - 2 * t);
+  }
+
+  function buildGlobe() {
+    var NP = 24, ND = 34, i, el;
+    for (i = 0; i < NP; i++) {
+      var k = i % 6;
+      el = document.createElement('div');
+      el.className = 'gn';
+      el.innerHTML = '<div class="ph" data-emoji="' + G_EMOJI[k] + '"><img src="./images/p' + (k + 1) +
+        '.jpg" alt="" width="360" height="360" draggable="false"></div>';
+      gGlobe.appendChild(el);
+      gNodes.push({ el: el, p: fib(NP, i), dot: false });
+    }
+    for (i = 0; i < ND; i++) {
+      el = document.createElement('i');
+      el.className = 'gd';
+      el.textContent = '♥';
+      gGlobe.appendChild(el);
+      gNodes.push({ el: el, p: fib(ND, i + 0.37), dot: true });
+    }
+  }
+
+  function gFrame(now) {
+    requestAnimationFrame(gFrame);
+    var dt = Math.min((now - gLast) / 1000, 0.05);
+    gLast = now;
+    if (document.hidden || document.body.classList.contains('lock')) return;
+
+    var t = (now - gT0) / 1000;
+    var op = Math.min(1, t / 2.6);                 // mở bung
+    var eo = easeOutBack(op);
+    gRot += (0.24 + (1 - op) * (1 - op) * 3 + gVel) * dt;
+    gVel *= Math.pow(0.05, dt);                     // quán tính giảm dần
+
+    var S = gGlobe.clientWidth || 300;
+    var R = S * 0.4 * eo;
+    var cr = Math.cos(gRot), sr = Math.sin(gRot), ct = Math.cos(gTilt), st = Math.sin(gTilt);
+    var appear = Math.min(1, op * 2);
+
+    for (var i = 0; i < gNodes.length; i++) {
+      var n = gNodes[i], p = n.p;
+      var x = p[0] * cr + p[2] * sr;
+      var z0 = -p[0] * sr + p[2] * cr;
+      var y = p[1] * ct - z0 * st;
+      var z = p[1] * st + z0 * ct;
+      var k = 4.2 / (4.2 - z);
+      var depth = (z + 1) / 2;
+      // mờ bớt phần đi ngang qua chữ ở giữa để chữ luôn đọc được
+      var fade = 0.3 + 0.7 * smooth(0.25, 0.7, Math.sqrt(x * x + y * y));
+      var o = (0.2 + 0.8 * Math.pow(depth, 0.9)) * fade * appear;
+      var s = k * (n.dot ? 0.8 : 0.9);
+      n.el.style.transform = 'translate3d(' + (x * R * k).toFixed(1) + 'px,' + (y * R * k).toFixed(1) + 'px,0) scale(' + s.toFixed(3) + ')';
+      n.el.style.opacity = o.toFixed(3);
+      n.el.style.zIndex = Math.round(depth * 100);
+    }
+  }
+
+  if (gGlobe) {
+    buildGlobe();
+    gT0 = performance.now();
+    gLast = gT0;
+    requestAnimationFrame(gFrame);
+
+    // kéo để xoay
+    var gLX = 0, gLY = 0;
+    gGlobe.addEventListener('pointerdown', function (e) {
+      gDrag = true; gLX = e.clientX; gLY = e.clientY;
+      if (gGlobe.setPointerCapture) { try { gGlobe.setPointerCapture(e.pointerId); } catch (err) { /* bỏ qua */ } }
+    });
+    gGlobe.addEventListener('pointermove', function (e) {
+      if (!gDrag) return;
+      var dx = e.clientX - gLX, dy = e.clientY - gLY;
+      gLX = e.clientX; gLY = e.clientY;
+      gRot += dx * 0.01;
+      gVel = Math.max(-6, Math.min(6, gVel * 0.5 + dx * 0.5));
+      gTilt = Math.max(-0.25, Math.min(0.95, gTilt + dy * 0.004));
+    });
+    function endDrag() { gDrag = null; }
+    gGlobe.addEventListener('pointerup', endDrag);
+    gGlobe.addEventListener('pointercancel', endDrag);
+
+    // hoa nở bung phía sau quả cầu khi vào trang
+    var stageEl = $('.stage');
+    if (stageEl && ctx) {
+      setTimeout(function () {
+        var r = stageEl.getBoundingClientRect();
+        bloom(r.left + r.width / 2, r.top + r.height / 2, r.width * 0.62);
+        bloom(r.left + r.width / 2, r.top + r.height / 2, r.width * 0.42, 700);
+      }, 350);
+    }
+  }
+
+  /* ---------------- Bó hoa: hoa hồng nở từng lớp cánh ---------------- */
+  // [x, y, kích thước, màu, độ trễ]
+  var ROSES = [
+    [200, 90, 84, '#ff4d7d', .30], [116, 136, 78, '#f06fa3', .22], [284, 136, 78, '#f06fa3', .26],
+    [64, 206, 68, '#a8174a', .14], [336, 206, 68, '#a8174a', .18], [150, 176, 92, '#e0245e', .34],
+    [250, 176, 92, '#ff8db8', .38], [200, 140, 86, '#d81b55', .42], [108, 254, 76, '#ff9cc2', .46],
+    [292, 254, 76, '#e0245e', .50], [200, 224, 100, '#ff3b6b', .56], [146, 276, 62, '#ff7aa6', .60],
+    [254, 276, 62, '#c61a50', .64]
+  ];
+
+  function petalSVG(a, cy, rx, ry, pd) {
+    return '<g transform="rotate(' + a + ')"><g class="pt" style="--pd:' + pd.toFixed(2) + 's">' +
+      '<ellipse cx="0" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="currentColor" stroke="#000" stroke-opacity=".3" stroke-width="1.5"/>' +
+      '<ellipse cx="0" cy="' + (cy - ry * 0.45).toFixed(1) + '" rx="' + (rx * 0.55).toFixed(1) + '" ry="' + (ry * 0.38).toFixed(1) + '" fill="#fff" fill-opacity=".16"/>' +
+      '</g></g>';
+  }
+
+  function roseLayers() {
+    var s = '<circle r="30" fill="currentColor" opacity=".55"/>', a;
+    for (a = 0; a < 5; a++) s += petalSVG(a * 72, -26, 22, 28, 0.44 + a * 0.05);       // vòng ngoài
+    for (a = 0; a < 5; a++) s += petalSVG(a * 72 + 36, -19, 18, 23, 0.22 + a * 0.04);  // vòng giữa
+    for (a = 0; a < 4; a++) s += petalSVG(a * 90 + 20, -12, 13, 17, a * 0.03);         // vòng trong
+    return s + '<circle r="8" fill="#000" fill-opacity=".3"/><circle r="4" fill="#000" fill-opacity=".25"/>';
+  }
+
+  function buildRoses() {
+    var host = $('#roses');
+    if (!host) return;
+    var stems = '', flowers = '';
+    ROSES.forEach(function (r) {
+      var x = r[0], y = r[1], d = r[4] * 1.5;
+      var cx = (200 + x) / 2 + (x - 200) * 0.12, cy = (300 + y) / 2;
+      stems += '<path class="stem" pathLength="1" style="--d:' + (d - 0.45).toFixed(2) + 's" d="M200,300 Q' +
+        cx.toFixed(0) + ',' + cy.toFixed(0) + ' ' + x + ',' + y + '"/>';
+      flowers += '<g transform="translate(' + x + ' ' + y + ') scale(' + (r[2] / 116).toFixed(3) + ')" style="color:' + r[3] +
+        ';--d:' + d.toFixed(2) + 's"><g class="bud">' + roseLayers() + '</g></g>';
+    });
+    host.innerHTML = stems + flowers;
+  }
+  buildRoses();
+
   /* ---------------- Ảnh vòng tròn: dự phòng khi ảnh lỗi ---------------- */
   function markFailed(img) {
     var box = img.parentNode;
@@ -227,17 +479,8 @@
   var closeTimer = 0;
 
   function setLabel() {
-    if (!wishLabel) return;
-    if (state === 0) {
-      wishLabel.textContent = 'Ấn vào đây để xem lời chúc';
-      wishIcon.textContent = '👆';
-    } else if (!seenBouquet) {
-      wishLabel.textContent = 'Ấn thêm lần nữa để nhận bó hoa 20/10';
-      wishIcon.textContent = '💐';
-    } else {
-      wishLabel.textContent = 'Xem lại bó hoa 20/10';
-      wishIcon.textContent = '💐';
-    }
+    // nút luôn ghi cùng một dòng
+    if (wishLabel) wishLabel.textContent = 'Ấn vào đây để xem tiếp';
   }
 
   function btnCenter() {
@@ -253,8 +496,10 @@
     var c = btnCenter();
     popHearts(c.x, c.y, 18);
     burst(c.x, Math.max(80, c.y - 120), 36);
+    bloom(c.x, c.y - 30, Math.min(W, H) * 0.3);
+    bloom(c.x, c.y - 30, Math.min(W, H) * 0.18, 450);
     setTimeout(function () {
-      if (wishBtn.scrollIntoView) wishBtn.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+      if (wishBtn.scrollIntoView) wishBtn.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
     }, 300);
   }
 
@@ -272,6 +517,15 @@
     burst(W * 0.75, H * 0.3, 44);
     setTimeout(function () { burst(W * 0.5, H * 0.2, 50); }, 350);
     popHearts(W / 2, H * 0.5, 28);
+    // hoa nở bung nhiều chỗ + mưa cánh hoa
+    var m = Math.min(W, H);
+    bloom(W * 0.5, H * 0.42, m * 0.5, 100);
+    bloom(W * 0.2, H * 0.24, m * 0.2, 500);
+    bloom(W * 0.82, H * 0.3, m * 0.22, 800);
+    bloom(W * 0.24, H * 0.76, m * 0.2, 1100);
+    bloom(W * 0.8, H * 0.74, m * 0.22, 1400);
+    petalRain(70);
+    setTimeout(function () { petalRain(40); }, 2200);
   }
 
   // toHeart = true: chuyển thẳng sang trái tim chữ (giữ khóa cuộn trang)
@@ -323,7 +577,7 @@
   var hsClose = $('#hsClose');
   var bqNext = $('#bqNext');
 
-  var H_WORDS = ['yêu em', 'Yêu Em', 'YÊU EM', 'Huyền'];
+  var H_WORDS = ['yêu em', 'Yêu Em', 'YÊU EM', 'Huyền Xinh gái'];
   var H_COLORS = ['#ff6fa5', '#ff3d85', '#ffb3d1', '#ff8fb8', '#ff5c9d', '#ffd0e3'];
   var H_CENTER = 'Anh yêu em';
   var FONT_BODY = '"Be Vietnam Pro", Arial, sans-serif';
@@ -580,7 +834,7 @@
     if (musicLabel) musicLabel.textContent = musicOn ? 'Tắt nhạc' : 'Bật nhạc';
   }
 
-  function setMusic(on) {
+  function setSynth(on) {
     if (!AC) return;
     try {
       if (on) {
@@ -612,8 +866,75 @@
     updateMusicUI();
   }
 
-  if (musicBtn) {
-    if (!AC) musicBtn.style.display = 'none';
-    musicBtn.addEventListener('click', function () { setMusic(!musicOn); });
+  /* --- Nhạc từ file của bạn (tùy chọn) ---
+     Bỏ file mp3 vào thư mục audio/ với đúng tên dưới đây.
+     Không có file thì tự dùng giai điệu nhẹ tạo bằng Web Audio ở trên. */
+  var AUDIO_SRC = './audio/unstoppable-aylex.mp3';
+  var AUDIO_START = 0; // giây bắt đầu phát
+  var AUDIO_END = 0;   // giây kết thúc đoạn lặp lại (0 = phát hết file rồi lặp)
+  var track = null, trackBad = false;
+
+  function getTrack() {
+    if (track) return track;
+    track = new Audio();
+    track.preload = 'none';
+    track.src = AUDIO_SRC;
+    track.loop = !AUDIO_END;
+    track.addEventListener('timeupdate', function () {
+      if (AUDIO_END && track.currentTime >= AUDIO_END) track.currentTime = AUDIO_START;
+    });
+    return track;
   }
+
+  function setMusic(on) {
+    if (trackBad || !window.Audio) { setSynth(on); return; }
+    var t = getTrack();
+    if (!on) {
+      t.pause();
+      musicOn = false;
+      updateMusicUI();
+      return;
+    }
+    try {
+      if (AUDIO_START && t.currentTime < AUDIO_START) t.currentTime = AUDIO_START;
+      var pr = t.play();
+      musicOn = true;
+      updateMusicUI();
+      if (pr && pr.catch) {
+        pr.catch(function (err) {
+          musicOn = false;
+          updateMusicUI();
+          if (err && err.name === 'NotAllowedError') {
+            armGesture(); // trình duyệt chặn tự phát: phát ở lần chạm đầu tiên
+            return;
+          }
+          // chưa có file hoặc không phát được: dùng giai điệu tự tạo
+          trackBad = true;
+          setSynth(true);
+        });
+      }
+    } catch (err) {
+      trackBad = true;
+      setSynth(true);
+    }
+  }
+
+  /* --- Tự phát nhạc khi vào web (không có nút) ---
+     Trình duyệt thường chặn âm thanh tự phát cho tới khi người xem chạm vào
+     trang. Vì vậy: thử phát ngay; nếu bị chặn thì phát ở lần chạm/bấm đầu tiên. */
+  var gestureArmed = false;
+  function armGesture() {
+    if (gestureArmed) return;
+    gestureArmed = true;
+    var evs = ['pointerdown', 'touchstart', 'touchend', 'click', 'keydown'];
+    function go() {
+      evs.forEach(function (e) { document.removeEventListener(e, go, true); });
+      gestureArmed = false;
+      if (!musicOn) setMusic(true);
+      else if (ac && ac.state === 'suspended') ac.resume();
+    }
+    evs.forEach(function (e) { document.addEventListener(e, go, true); });
+  }
+  armGesture();
+  setMusic(true);
 })();

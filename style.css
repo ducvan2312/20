@@ -1,5 +1,5 @@
 /* ==========================================================
-   Quà 20/10 cho Huyền — Romantic Pink / Luxury Love
+   Quà 20/10 cho Huyền Xinh gái — Romantic Pink / Luxury Love
    ========================================================== */
 
 :root {
@@ -108,46 +108,6 @@ body.lock #fx { z-index: 60; }
   to   { transform: translate3d(-50%, 0, 0); }
 }
 
-/* ---------- Nút nhạc ---------- */
-.music-btn {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 20;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 8px 16px;
-  color: var(--text);
-  font-size: .88rem;
-  font-weight: 500;
-  background: rgba(40, 10, 40, .6);
-  border: 1px solid rgba(255, 150, 200, .4);
-  border-radius: 999px;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  transition: background .3s, box-shadow .3s, border-color .3s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.music-btn:hover { border-color: var(--pink); }
-
-.music-btn.on {
-  background: linear-gradient(135deg, rgba(255, 77, 141, .75), rgba(180, 60, 160, .75));
-  border-color: #ffc0d9;
-  box-shadow: 0 0 20px rgba(255, 90, 160, .55);
-}
-
-.music-icon { display: inline-block; font-size: 1.1rem; }
-.music-btn.on .music-icon { animation: note 1.4s ease-in-out infinite; }
-
-@keyframes note {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-3px) rotate(12deg); }
-}
-
 /* ---------- Bố cục ---------- */
 .page {
   position: relative;
@@ -159,7 +119,7 @@ body.lock #fx { z-index: 60; }
   gap: 14px;
   min-height: 100vh;
   min-height: 100svh;
-  padding: 62px 16px 28px;
+  padding: 28px 16px 28px;
   text-align: center;
   overflow-x: clip;
 }
@@ -184,7 +144,7 @@ body.lock #fx { z-index: 60; }
 /* ---------- Vòng tròn ảnh quay ---------- */
 .stage {
   --S: clamp(260px, min(90vw, 62vh), 440px);
-  --ps: calc(var(--S) * .2);
+  --ps: calc(var(--S) * .155);
   --R: calc(var(--S) * .4);
   position: relative;
   width: var(--S);
@@ -201,35 +161,64 @@ body.lock #fx { z-index: 60; }
   pointer-events: none;
 }
 
-.track {
+/* Vành quỹ đạo mảnh quanh quả cầu */
+.ring {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: calc(var(--R) * 2);
-  height: calc(var(--R) * 2);
-  margin: calc(var(--R) * -1) 0 0 calc(var(--R) * -1);
-  border: 1.5px dashed rgba(255, 160, 205, .5);
+  width: calc(var(--R) * 2.15);
+  height: calc(var(--R) * 2.15);
+  margin: calc(var(--R) * -1.075) 0 0 calc(var(--R) * -1.075);
+  border: 1px dashed rgba(255, 160, 205, .34);
   border-radius: 50%;
-  animation: spin 90s linear infinite reverse;
+  transform: rotate(var(--rz)) scaleY(.3);
+  animation: ringSpin var(--rd) linear infinite;
+  pointer-events: none;
 }
 
-.orbit {
+@keyframes ringSpin {
+  from { transform: rotate(var(--rz)) scaleY(.3); }
+  to   { transform: rotate(calc(var(--rz) + 360deg)) scaleY(.3); }
+}
+
+/* Quả cầu ảnh 3D (vị trí được JS tính mỗi khung hình) */
+.globe {
   position: absolute;
   inset: 0;
-  animation: spin 48s linear infinite;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-.slot, .dot {
+.globe:active { cursor: grabbing; }
+
+.gn, .gd {
   position: absolute;
   left: 50%;
   top: 50%;
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
-.slot {
+.gn {
   width: var(--ps);
   height: var(--ps);
   margin: calc(var(--ps) / -2) 0 0 calc(var(--ps) / -2);
-  transform: rotate(var(--a)) translateY(calc(var(--R) * -1)) rotate(calc(var(--a) * -1));
+}
+
+.gd {
+  display: grid;
+  place-items: center;
+  width: calc(var(--ps) * .34);
+  height: calc(var(--ps) * .34);
+  margin: calc(var(--ps) * -.17) 0 0 calc(var(--ps) * -.17);
+  font-style: normal;
+  font-size: calc(var(--ps) * .3);
+  line-height: 1;
+  color: #ff6fa5;
+  text-shadow: 0 0 10px rgba(255, 90, 160, .9);
+  pointer-events: none;
 }
 
 .ph {
@@ -240,7 +229,6 @@ body.lock #fx { z-index: 60; }
   border-radius: 50%;
   background: linear-gradient(160deg, #5a1a4a, #2a0f3a);
   box-shadow: 0 0 0 3px rgba(255, 110, 170, .25), 0 0 20px rgba(255, 110, 170, .6), 0 8px 18px rgba(0, 0, 0, .5);
-  animation: spin 48s linear infinite reverse; /* giữ ảnh luôn thẳng */
 }
 
 .ph img {
@@ -248,6 +236,8 @@ body.lock #fx { z-index: 60; }
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .ph.img-fail::after {
@@ -260,26 +250,6 @@ body.lock #fx { z-index: 60; }
   background: linear-gradient(160deg, #ff7eb6, #7a1038 60%, #2a0f3a);
 }
 
-.dot {
-  width: calc(var(--ps) * .3);
-  height: calc(var(--ps) * .3);
-  margin: calc(var(--ps) * -.15) 0 0 calc(var(--ps) * -.15);
-  transform: rotate(var(--a)) translateY(calc(var(--R) * -1)) rotate(calc(var(--a) * -1));
-}
-
-.dot b {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  font-size: calc(var(--ps) * .3);
-  line-height: 1;
-  font-weight: 400;
-  color: #ff6fa5;
-  text-shadow: 0 0 10px rgba(255, 90, 160, .9);
-  animation: spin 48s linear infinite reverse;
-}
-
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
@@ -289,6 +259,7 @@ body.lock #fx { z-index: 60; }
 .core {
   position: absolute;
   inset: 0;
+  z-index: 200;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -303,7 +274,7 @@ body.lock #fx { z-index: 60; }
   font-size: calc(var(--S) * .066);
   line-height: 1.1;
   color: #ffc4dc;
-  text-shadow: 0 0 20px rgba(255, 90, 160, .6);
+  text-shadow: 0 0 20px rgba(255, 90, 160, .6), 0 2px 5px rgba(13, 4, 16, .9);
 }
 
 .c-date {
@@ -338,7 +309,7 @@ body.lock #fx { z-index: 60; }
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 0 10px rgba(255, 90, 160, .5));
+  filter: drop-shadow(0 0 10px rgba(255, 90, 160, .5)) drop-shadow(0 2px 5px rgba(13, 4, 16, .9));
 }
 
 .heart {
@@ -358,7 +329,7 @@ body.lock #fx { z-index: 60; }
 
 /* ---------- Lời chúc: bấm để xem ---------- */
 .wish {
-  width: min(100%, 520px);
+  width: min(100%, 680px);
 }
 
 .wish-btn {
@@ -411,42 +382,95 @@ body.lock #fx { z-index: 60; }
 
 .wish.open .wish-body { grid-template-rows: 1fr; }
 
-.wish-clip { min-height: 0; overflow: hidden; }
+.wish-btn { scroll-margin-top: 16px; }
 
+/* Chừa chỗ cho viền sáng của lá thư, không bị cắt */
+.wish-clip {
+  min-height: 0;
+  overflow: hidden;
+  padding: 16px 16px 20px;
+  margin: -16px -16px -20px;
+  pointer-events: none;
+}
+
+/* ---------- Lá thư ---------- */
 .wish-card {
-  margin-top: 12px;
-  padding: 18px 20px 14px;
+  position: relative;
+  margin-top: 16px;
+  padding: clamp(36px, 8vw, 56px) clamp(22px, 6vw, 52px) clamp(30px, 6vw, 44px);
+  text-align: left;
+  color: #5a1e3a;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255, 255, 255, .75), transparent 70%),
+    linear-gradient(165deg, #fff4f8, #ffd6e6);
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 2px rgba(255, 205, 228, .9),
+    0 0 0 6px rgba(255, 110, 170, .32),
+    0 0 26px rgba(255, 80, 160, .6),
+    0 22px 44px rgba(0, 0, 0, .5);
   opacity: 0;
-  transform: translateY(12px);
-  background: linear-gradient(160deg, rgba(60, 16, 64, .82), rgba(28, 7, 32, .82));
-  border: 1px solid rgba(255, 150, 200, .38);
-  border-radius: 18px;
-  box-shadow: 0 0 30px rgba(255, 70, 150, .3);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  transition: opacity .6s ease .25s, transform .6s ease .25s;
+  transform: translateY(16px) scale(.97);
+  pointer-events: auto;
+  transition: opacity .6s ease .25s, transform .7s cubic-bezier(.2, .9, .3, 1.1) .25s;
 }
 
 .wish.open .wish-card { opacity: 1; transform: none; }
 
+.wl-title {
+  margin: 0 0 16px;
+  font-family: var(--font-script);
+  font-size: clamp(1.9rem, 7.6vw, 3.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+  color: #c0145f;
+  text-shadow: 0 0 18px rgba(255, 90, 160, .35);
+}
+
 .wish-card p {
-  margin: 0;
-  font-size: clamp(.95rem, 3.5vw, 1.05rem);
-  line-height: 1.75;
+  margin: 0 0 14px;
+  font-size: clamp(1.04rem, 4vw, 1.22rem);
+  line-height: 1.85;
   text-wrap: pretty;
 }
 
+.wish-card .wl-love {
+  margin-top: 18px;
+  font-weight: 600;
+  color: #b01558;
+}
+
 .wish-card .sig {
-  margin-top: 6px;
+  margin: 20px 0 0;
   text-align: right;
   font-family: var(--font-script);
-  font-size: 1.5rem;
-  line-height: 1.3;
-  color: var(--gold);
+  font-size: clamp(1.6rem, 6.4vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1.4;
+  color: #8a1048;
+}
+
+.wish-card .sig span { font-size: 1.15em; }
+
+.wc {
+  position: absolute;
+  font-size: 1.8rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(120, 20, 60, .35));
+  animation: wobble 5s ease-in-out infinite alternate;
+}
+
+.wc1 { top: 10px; left: 12px; }
+.wc2 { top: 10px; right: 12px; animation-delay: -1.5s; }
+.wc3 { bottom: 10px; left: 12px; animation-delay: -3s; }
+.wc4 { bottom: 10px; right: 12px; animation-delay: -2s; }
+
+@keyframes wobble {
+  from { transform: rotate(-10deg); }
+  to   { transform: rotate(10deg); }
 }
 
 .wish-btn:focus-visible,
-.music-btn:focus-visible,
 .bq-close:focus-visible {
   outline: 3px solid var(--gold);
   outline-offset: 3px;
@@ -577,6 +601,47 @@ body.lock #fx { z-index: 60; }
 
 .bq-close:hover { background: rgba(255, 255, 255, .16); }
 
+/* ---------- Hoa hồng nở từng lớp cánh ---------- */
+.stem {
+  fill: none;
+  stroke: #2f9e5b;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.bq.show .stem { animation: stemGrow .9s ease-out var(--d, 0s) forwards; }
+
+@keyframes stemGrow { to { stroke-dashoffset: 0; } }
+
+.pt {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scale(0);
+}
+
+.bq.show .pt {
+  animation: petalOpen .95s cubic-bezier(.2, 1.35, .4, 1) calc(var(--d, 0s) + var(--pd, 0s)) forwards;
+}
+
+@keyframes petalOpen {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+.bud {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.bq.show .bud { animation: budTurn 1.8s ease-out var(--d, 0s) both; }
+
+@keyframes budTurn {
+  from { transform: rotate(-75deg); }
+  to   { transform: rotate(0deg); }
+}
+
 /* ---------- Nút chuyển sang trái tim ---------- */
 .bq-actions {
   display: flex;
@@ -650,14 +715,20 @@ body.lock #fx { z-index: 60; }
 
 body.heart-on #fx { opacity: 0; }
 
+.credit {
+  margin: 0;
+  font-size: .72rem;
+  letter-spacing: .03em;
+  color: rgba(255, 200, 225, .55);
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 380px) {
-  .music-btn { padding: 8px 13px; font-size: .82rem; }
-  .page { padding-top: 58px; }
+  .page { padding-top: 24px; }
 }
 
 @media (max-height: 640px) {
-  .page { gap: 10px; padding-top: 56px; }
+  .page { gap: 10px; padding-top: 22px; }
 }
 
 /* ---------- Giảm chuyển động ---------- */
@@ -665,8 +736,7 @@ body.heart-on #fx { opacity: 0; }
    chỉ tắt các hiệu ứng nhấp nháy / nảy nhanh. */
 @media (prefers-reduced-motion: reduce) {
   .wish-btn.pulse, .hand, .c-date, .heart, .tw, .bq-next,
-  .music-btn.on .music-icon, .sway, .dot b {
+  .sway {
     animation: none;
   }
-  .dot b { animation: spin 48s linear infinite reverse; }
 }
